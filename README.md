@@ -1,33 +1,207 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Finance Tracker
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A fully functional finance tracking application built with Laravel, featuring income/expense management, visual analytics, and cumulative savings tracking.
 
-## About Laravel
+## Setup Instructions
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Prerequisites
+- PHP 8.2+
+- MySQL 5.7+
+- Composer
+- Node.js & npm
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **Install dependencies**
+   ```bash
+   composer install
+   ```
 
-## Learning Laravel
+2. **Configure environment**
+   ```bash
+   cp .env.example .env
+   ```
+   Update the following in `.env`:
+   - `DB_DATABASE=finace_tracker` (or your database name)
+   - `DB_USERNAME=root` (your MySQL username)
+   - `DB_PASSWORD=` (your MySQL password, leave empty if no password)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+3. **Generate application key**
+   ```bash
+   php artisan key:generate
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. **Run migrations**
+   ```bash
+   php artisan migrate
+   ```
 
-## Laravel Sponsors
+5. **Seed the database with demo data**
+   ```bash
+   php artisan db:seed
+   ```
+
+6. **Install frontend dependencies**
+   ```bash
+   npm install
+   ```
+
+7. **Build assets**
+   ```bash
+   npm run dev
+   ```
+
+8. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
+
+9. **Visit the application**
+   Open your browser and go to `http://localhost:8000`
+
+## Demo Account
+
+Use these credentials to test the application:
+- **Email:** demo@demo.com
+- **Password:** password
+
+The demo account comes pre-populated with sample income and expense data for January 2026.
+
+## Features
+
+### Authentication
+- User registration and login
+- Password-protected finance data (user-scoped)
+- Session-based authentication
+
+### Dashboard
+- Month/year selector to view specific periods
+- Income and expense tables with CRUD operations
+- Total income and expense calculations
+- Cumulative savings line chart (Jan-Dec current year)
+- Color-coded tags for quick categorization
+
+### Analytics
+- Monthly summary grid (3-column layout)
+- Expense breakdown doughnut chart by category
+- Income/Expenses/Net for all 12 months
+- Current month highlighting
+
+### Data Categories
+
+**Income Tags:** Salary, Freelance, Other
+
+**Expense Tags:** Rent/Mortgage, Utilities, Miscellaneous, Retail, Other
+
+### Chart Visualization
+- Chart.js for line and doughnut charts
+- Real-time data updates
+- Dark green theme for dashboard chart
+- Color-coded expense categories in analytics
+
+## Technology Stack
+
+- **Backend:** Laravel 12 with Eloquent ORM
+- **Frontend:** Blade templates with Tailwind CSS
+- **Database:** MySQL
+- **Charts:** Chart.js (CDN)
+- **Bundler:** Vite
+
+## Project Structure
+
+```
+app/
+├── Http/Controllers/
+│   ├── DashboardController.php
+│   ├── IncomeController.php
+│   ├── ExpenseController.php
+│   └── AnalyticsController.php
+└── Models/
+    ├── User.php
+    ├── IncomeEntry.php
+    └── ExpenseEntry.php
+
+database/
+├── migrations/
+│   ├── create_income_entries_table.php
+│   └── create_expense_entries_table.php
+└── seeders/
+    └── DatabaseSeeder.php
+
+resources/views/
+├── layouts/
+│   └── app.blade.php
+├── auth/
+│   ├── login.blade.php
+│   ├── register.blade.php
+│   └── forgot-password.blade.php
+├── dashboard.blade.php
+├── analytics.blade.php
+└── index.blade.php
+```
+
+## API Routes
+
+All routes are protected by the `auth` middleware.
+
+### Authentication
+- `GET /login` - Login page
+- `POST /login` - Process login
+- `GET /register` - Registration page
+- `POST /register` - Process registration
+- `GET /logout` - Logout user
+
+### Finance
+- `GET /dashboard` - Main dashboard
+- `GET /analytics` - Analytics view
+
+### Income Management
+- `POST /income` - Create income entry
+- `PUT /income/{id}` - Update income entry
+- `DELETE /income/{id}` - Delete income entry
+
+### Expense Management
+- `POST /expense` - Create expense entry
+- `PUT /expense/{id}` - Update expense entry
+- `DELETE /expense/{id}` - Delete expense entry
+
+## Database Schema
+
+### income_entries
+- id
+- user_id (FK)
+- source (string)
+- amount (decimal 10,2)
+- tag (enum: Salary, Freelance, Other)
+- date (date)
+- month (tinyint)
+- year (smallint)
+- timestamps
+
+### expense_entries
+- id
+- user_id (FK)
+- source (string)
+- amount (decimal 10,2)
+- tag (enum: Rent/Mortgage, Utilities, Miscellaneous, Retail, Other)
+- date (date)
+- month (tinyint)
+- year (smallint)
+- timestamps
+
+## Validation
+
+All form inputs are validated:
+- Amount must be numeric and > 0
+- Date must be valid
+- Source must be provided
+- Tag must match enum values
+- User can only access/modify their own data
+
+## License
+
+MIT
+
 
 We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
