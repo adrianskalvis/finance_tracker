@@ -31,42 +31,42 @@ Route::middleware('guest')->group(function () {
     Route::get('login', function () {
         return view('auth.login');
     })->name('login');
-    
+
     Route::post('login', function (Request $request) {
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        
+
         if (auth()->attempt($credentials, $request->boolean('remember'))) {
             return redirect()->intended('dashboard');
         }
-        
+
         return back()->withErrors(['email' => 'Invalid credentials']);
     });
-    
+
     Route::get('register', function () {
         return view('auth.register');
     })->name('register');
-    
+
     Route::post('register', function (Request $request) {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
-        
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
         ]);
-        
+
         auth()->login($user);
-        
+
         return redirect('dashboard');
     });
-    
+
     Route::get('forgot-password', function () {
         return view('auth.forgot-password');
     })->name('password.request');
@@ -79,16 +79,22 @@ Route::middleware('auth')->group(function () {
         $request->session()->regenerateToken();
         return redirect('/');
     })->name('logout');
-    
+
     // Finance routes
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('analytics', AnalyticsController::class)->name('analytics');
-    
+
+    // Password reset routes
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
     // Income routes
     Route::post('income', [IncomeController::class, 'store'])->name('income.store');
     Route::put('income/{incomeEntry}', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('income/{incomeEntry}', [IncomeController::class, 'destroy'])->name('income.destroy');
-    
+
     // Expense routes
     Route::post('expense', [ExpenseController::class, 'store'])->name('expense.store');
     Route::put('expense/{expenseEntry}', [ExpenseController::class, 'update'])->name('expense.update');
